@@ -1,0 +1,241 @@
+#
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+# error issues : if peer dont go up, it problem with dns and host "reinstall docker"
+# NOTE FOR PRIVATE DATA : each peer must have own defined couch that depend on him 
+# NOTE FOR PRIVATE DATA : define env. var CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=nameofcouch and CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+# if you don't have upside setup, all peers have the same ledger state
+version: '2'
+
+services:
+
+  ca.org1.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-buyer
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.buyer.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.buyer.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk
+    ports:
+      - "7054:7054"
+    command: sh -c "fabric-ca-server start -b buyer_admin:buyer2019 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.buyer.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk"
+    volumes:
+      - ./crypto-config/peerOrganizations/buyer.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_buyer
+
+  ca.org2.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-seller
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.seller.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.seller.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk
+    ports:
+      - "8054:7054"
+    command: sh -c "fabric-ca-server start -b seller_admin:seller2019  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk"
+    volumes:
+      - ./crypto-config/peerOrganizations/seller.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_seller
+  
+  ca.org3.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-regulator
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.regulator.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.regulator.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk
+    ports:
+      - "9054:7054"
+    command: sh -c "fabric-ca-server start -b regulator_admin:regulator2019  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.regulator.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk"
+    volumes:
+      - ./crypto-config/peerOrganizations/regulator.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_regulator
+  
+  ca.org4.example.com:
+    image: hyperledger/fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-logistic
+      - FABRIC_CA_SERVER_CA_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.logistic.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_CA_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.logistic.iot-logistic.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk
+    ports:
+      - "10054:7054"
+    command: sh -c "fabric-ca-server start -b logistic_admin:logistic2019 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.logistic.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk"
+    volumes:
+      - ./crypto-config/peerOrganizations/logistic.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_logistic
+
+  orderer.iot-logistic.com:
+    container_name: orderer.iot-logistic.com
+    image: hyperledger/fabric-orderer
+    environment:
+      - FABRIC_LOGGING_SPEC=DEBUG
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/etc/hyperledger/configtx/genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/etc/hyperledger/crypto/orderer/msp
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/etc/hyperledger/crypto/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/etc/hyperledger/crypto/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/etc/hyperledger/crypto/orderer/tls/ca.crt,/etc/hyperledger/crypto/peerRegulator/tls/ca.crt,/etc/hyperledger/crypto/peerBuyer/tls/ca.crt,/etc/hyperledger/crypto/peerSeller/tls/ca.crt,/etc/hyperledger/crypto/peerLogistic/tls/ca.crt]
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/orderers
+    command: orderer
+    ports:
+      - 7050:7050
+    volumes:
+        - ./artifacts:/etc/hyperledger/configtx
+        - ./crypto-config/ordererOrganizations/iot-logistic.com/orderers/orderer.iot-logistic.com/:/etc/hyperledger/crypto/orderer
+        - ./crypto-config/peerOrganizations/regulator.iot-logistic.com/peers/peer0.regulator.iot-logistic.com/:/etc/hyperledger/crypto/peerRegulator
+        - ./crypto-config/peerOrganizations/buyer.iot-logistic.com/peers/peer0.buyer.iot-logistic.com/:/etc/hyperledger/crypto/peerBuyer
+        - ./crypto-config/peerOrganizations/seller.iot-logistic.com/peers/peer0.seller.iot-logistic.com/:/etc/hyperledger/crypto/peerSeller
+        - ./crypto-config/peerOrganizations/logistic.iot-logistic.com/peers/peer0.logistic.iot-logistic.com/:/etc/hyperledger/crypto/peerLogistic
+
+  ledger.state.regulator:
+    container_name: ledger.state.regulator
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 5984:5984    
+
+  peer0.regulator.iot-logistic.com:
+    container_name: peer0.regulator.iot-logistic.com
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=ledger.state.regulator:5984 
+      - CORE_PEER_ID=peer0.regulator.iot-logistic.com
+      - CORE_PEER_LOCALMSPID=RegulatorMSP
+      - CORE_PEER_ADDRESS=peer0.regulator.iot-logistic.com:7051    
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.regulator.iot-logistic.com:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.regulator.iot-logistic.com:7052
+    ports:
+      - 7051:7051
+      - 7052:7052
+      - 7053:7053
+    volumes:
+        - ./crypto-config/peerOrganizations/regulator.iot-logistic.com/peers/peer0.regulator.iot-logistic.com/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - orderer.iot-logistic.com
+      - ledger.state.regulator
+
+  ledger.state.buyer:
+    container_name: ledger.state.buyer
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 6984:5984   
+  
+
+  peer0.buyer.iot-logistic.com:
+    container_name: peer0.buyer.iot-logistic.com
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=ledger.state.buyer:5984 
+      - CORE_PEER_ID=peer0.buyer.iot-logistic.com
+      - CORE_PEER_LOCALMSPID=BuyerMSP
+      - CORE_PEER_ADDRESS=peer0.buyer.iot-logistic.com:7051   
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.buyer.iot-logistic.com:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.buyer.iot-logistic.com:7052
+    ports:
+      - 8051:7051
+      - 8052:7052
+      - 8053:7053
+    volumes:
+        - ./crypto-config/peerOrganizations/buyer.iot-logistic.com/peers/peer0.buyer.iot-logistic.com/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - orderer.iot-logistic.com
+      - ledger.state.buyer
+  
+  ledger.state.seller:
+    container_name: ledger.state.seller
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 7984:5984 
+
+  peer0.seller.iot-logistic.com:
+    container_name: peer0.seller.iot-logistic.com
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=ledger.state.seller:5984 
+      - CORE_PEER_ID=peer0.seller.iot-logistic.com
+      - CORE_PEER_LOCALMSPID=SellerMSP
+      - CORE_PEER_ADDRESS=peer0.seller.iot-logistic.com:7051   
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.seller.iot-logistic.com:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.seller.iot-logistic.com:7052
+    ports:
+      - 9051:7051
+      - 9052:7052
+      - 9053:7053
+    volumes:
+        - ./crypto-config/peerOrganizations/seller.iot-logistic.com/peers/peer0.seller.iot-logistic.com/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - orderer.iot-logistic.com
+      - ledger.state.seller
+
+  ledger.state.logistic:
+    container_name: ledger.state.logistic
+    image: hyperledger/fabric-couchdb
+    # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
+    # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
+    environment:
+      - COUCHDB_USER=
+      - COUCHDB_PASSWORD=
+    ports:
+      - 8984:5984 
+  
+  peer0.logistic.iot-logistic.com:
+    container_name: peer0.logistic.iot-logistic.com
+    extends:
+      file:   base.yaml
+      service: peer-base
+    environment:
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=ledger.state.logistic:5984 
+      - CORE_PEER_ID=peer0.logistic.iot-logistic.com
+      - CORE_PEER_LOCALMSPID=LogisticMSP
+      - CORE_PEER_ADDRESS=peer0.logistic.iot-logistic.com:7051   
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.logistic.iot-logistic.com:7051
+      - CORE_PEER_CHAINCODELISTENADDRESS=peer0.logistic.iot-logistic.com:7052
+    ports:
+      - 10051:7051
+      - 10052:7052
+      - 10053:7053
+    volumes:
+        - ./crypto-config/peerOrganizations/logistic.iot-logistic.com/peers/peer0.logistic.iot-logistic.com/:/etc/hyperledger/crypto/peer
+    depends_on:
+      - orderer.iot-logistic.com
+      - ledger.state.logistic
+
+
