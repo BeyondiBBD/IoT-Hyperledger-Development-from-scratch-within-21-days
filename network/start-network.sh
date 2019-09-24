@@ -50,4 +50,29 @@ function restartNetwork() {
 	echo
 }
 
+# Install Node modules
+
+function installNodeModules() {
+	echo
+	if [ -d node_modules ]; then
+		echo "============== node modules installed already ============="
+	else
+		echo "============== Installing node modules ============="
+		npm install
+	fi
+	echo
+}
+
+
 restartNetwork
+
+installNodeModules
+
+cd ..
+
+node ./lib/members/enroll-admin.js Buyer
+node ./lib/members/enroll-admin.js Seller
+node ./lib/members/enroll-admin.js Regulator
+node ./lib/members/enroll-admin.js Logistic
+
+PORT=4000 nodemon app

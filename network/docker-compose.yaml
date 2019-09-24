@@ -22,9 +22,10 @@ services:
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk
     ports:
       - "7054:7054"
-    command: sh -c "fabric-ca-server start -b buyer_admin:buyer2019 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.buyer.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk"
+    command: sh -c "fabric-ca-server start -b buyer_admin --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.buyer.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/c47807218859eb00c124639276fca6ef194fd98bb29a38c8cc0b1cf008cdb22a_sk"
     volumes:
       - ./crypto-config/peerOrganizations/buyer.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ../config/ca/ca-buyer.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     container_name: ca_buyer
 
   ca.org2.example.com:
@@ -39,9 +40,11 @@ services:
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk
     ports:
       - "8054:7054"
-    command: sh -c "fabric-ca-server start -b seller_admin:seller2019  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk"
+    command: sh -c "fabric-ca-server start -b seller_admin  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.seller.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/2e253c9d64cbd6006a4b2aa25a2ad76bbd117c301b46995604ef48323522ae52_sk"
     volumes:
       - ./crypto-config/peerOrganizations/seller.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ../config/ca/ca-seller.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
     container_name: ca_seller
   
   ca.org3.example.com:
@@ -56,9 +59,11 @@ services:
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk
     ports:
       - "9054:7054"
-    command: sh -c "fabric-ca-server start -b regulator_admin:regulator2019  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.regulator.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk"
+    command: sh -c "fabric-ca-server start -b regulator_admin  --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.regulator.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/da78b261cd0b6abfc13140adfafcb84cc3c42685878273b0b993d53f63cddf99_sk"
     volumes:
       - ./crypto-config/peerOrganizations/regulator.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ../config/ca/ca-regulator.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
     container_name: ca_regulator
   
   ca.org4.example.com:
@@ -73,9 +78,11 @@ services:
       - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk
     ports:
       - "10054:7054"
-    command: sh -c "fabric-ca-server start -b logistic_admin:logistic2019 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.logistic.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk"
+    command: sh -c "fabric-ca-server start -b logistic_admin --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.logistic.iot-logistic.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/e2fe63b2848c628280e1d15b9ca707e24bbfd1967c0a981a6f6744a34e42c22d_sk"
     volumes:
       - ./crypto-config/peerOrganizations/logistic.iot-logistic.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ../config/ca/ca-logistic.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
+
     container_name: ca_logistic
 
   orderer.iot-logistic.com:

@@ -1,0 +1,276 @@
+---
+#
+# The network connection profile provides client applications the information about the target
+# blockchain network that are necessary for the applications to interact with it. These are all
+# knowledge that must be acquired from out-of-band sources. This file provides such a source.
+#
+name: "iot-logistic"
+
+#
+# Any properties with an "x-" prefix will be treated as application-specific, exactly like how naming
+# in HTTP headers or swagger properties work. The SDK will simply ignore these fields and leave
+# them for the applications to process. This is a mechanism for different components of an application
+# to exchange information that are not part of the standard schema described below. In particular,
+# the "x-type" property with the "hlfv1" value example below is used by Hyperledger Composer to
+# determine the type of Fabric networks (v0.6 vs. v1.0) it needs to work with.
+#
+x-type: "hlfv1"
+
+#
+# Describe what the target network is/does.
+#
+description: "Logistic network"
+
+#
+# Schema version of the content. Used by the SDK to apply the corresponding parsing rules.
+#
+version: "1.0"
+
+#
+# The client section will be added on a per org basis see org1.yaml and org2.yaml
+#
+#client:
+
+#
+# [Optional]. But most apps would have this section so that channel objects can be constructed
+# based on the content below. If an app is creating channels, then it likely will not need this
+# section.
+#
+channels:
+  # name of the channel
+  logisticchannel:
+    # Required. list of orderers designated by the application to use for transactions on this
+    # channel. This list can be a result of access control ("org1" can only access "ordererA"), or
+    # operational decisions to share loads from applications among the orderers.  The values must
+    # be "names" of orgs defined under "organizations/peers"
+    orderers:
+      - orderer.iot-logistic.com
+
+    # Required. list of peers from participating orgs
+    peers:
+      peer0.regulator.iot-logistic.com:
+        # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
+        # have the chaincode installed. The app can also use this property to decide which peers
+        # to send the chaincode install request. Default: true
+        endorsingPeer: true
+
+        # [Optional]. will this peer be sent query proposals? The peer must have the chaincode
+        # installed. The app can also use this property to decide which peers to send the
+        # chaincode install request. Default: true
+        chaincodeQuery: true
+
+        # [Optional]. will this peer be sent query proposals that do not require chaincodes, like
+        # queryBlock(), queryTransaction(), etc. Default: true
+        ledgerQuery: true
+
+        # [Optional]. will this peer be the target of the SDK's listener registration? All peers can
+        # produce events but the app typically only needs to connect to one to listen to events.
+        # Default: true
+        eventSource: true
+
+      peer0.buyer.iot-logistic.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer0.seller.iot-logistic.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+      peer0.logistic.iot-logistic.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+
+
+    # [Optional]. what chaincodes are expected to exist on this channel? The application can use
+    # this information to validate that the target peers are in the expected state by comparing
+    # this list with the query results of getInstalledChaincodes() and getInstantiatedChaincodes()
+    chaincodes:
+      # the format follows the "cannonical name" of chaincodes by fabric code
+      - users:v0
+      - locations:v0
+      - events:v1.0
+      - sensors:v0
+
+#
+# list of participating organizations in this network
+#
+organizations:
+  Regulator:
+    mspid: RegulatorMSP
+
+    peers:
+      - peer0.regulator.iot-logistic.com
+
+    # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
+    # network. Typically certificates provisioning is done in a separate process outside of the
+    # runtime network. Fabric-CA is a special certificate authority that provides a REST APIs for
+    # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
+    # Fabric-CA servers.
+    certificateAuthorities:
+      - ca-regulator
+
+    # [Optional]. If the application is going to make requests that are reserved to organization
+    # administrators, including creating/updating channels, installing/instantiating chaincodes, it
+    # must have access to the admin identity represented by the private key and signing certificate.
+    # Both properties can be the PEM string or local path to the PEM file. Note that this is mainly for
+    # convenience in development mode, production systems should not expose sensitive information
+    # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
+    # this route as an alternative when it exists.
+    adminPrivateKey:
+      path: network/channel/crypto-config/peerOrganizations/regulator.iot-logistic.com/users/Admin@regulator.iot-logistic.com/msp/keystore/60bd771a4de02e92910a5c807cd3aa8014f9c86a1cdb2878fdb7632e95394c0b_sk
+    signedCert:
+      path: network/channel/crypto-config/peerOrganizations/regulator.iot-logistic.com/users/Admin@regulator.iot-logistic.com/msp/signcerts/Admin@regulator.iot-logistic.com-cert.pem
+
+  # the profile will contain public information about organizations other than the one it belongs to.
+  # These are necessary information to make transaction lifecycles work, including MSP IDs and
+  # peers with a public URL to send transaction proposals. The file will not contain private
+  # information reserved for members of the organization, such as admin key and certificate,
+  # fabric-ca registrar enroll ID and secret, etc.
+  Buyer:
+    mspid: BuyerMSP
+    peers:
+      - peer0.buyer.iot-logistic.com
+    certificateAuthorities:
+      - ca-buyer
+    adminPrivateKey:
+      path: network/channel/crypto-config/peerOrganizations/buyer.iot-logistic.com/users/Admin@buyer.iot-logistic.com/msp/keystore/b8bf563a4ffee88994851c45df7172a97d9a8ca24626d5bdacc251c459daaddc_sk
+    signedCert:
+      path: network/channel/crypto-config/peerOrganizations/buyer.iot-logistic.com/users/Admin@buyer.iot-logistic.com/msp/signcerts/Admin@buyer.iot-logistic.com-cert.pem
+
+  Seller:
+    mspid: SellerSP
+    peers:
+      - peer0.seller.iot-logistic.com
+    certificateAuthorities:
+      - ca-seller
+    adminPrivateKey:
+      path: network/channel/crypto-config/peerOrganizations/seller.iot-logistic.com/users/Admin@seller.iot-logistic.com/msp/keystore/bf5cd645b07d4be89fc163c61afd630250fda83e22b13c0612b88fb93d7e851c_sk
+    signedCert:
+      path: network/channel/crypto-config/peerOrganizations/seller.iot-logistic.com/users/Admin@seller.iot-logistic.com/msp/signcerts/Admin@seller.iot-logistic.com-cert.pem
+
+  Logistic:
+    mspid: LogisticMSP
+    peers:
+      - peer0.logistic.iot-logistic.com
+    certificateAuthorities:
+      - ca-logistic
+    adminPrivateKey:
+      path: network/channel/crypto-config/peerOrganizations/logistic.iot-logistic.com/users/Admin@logistic.iot-logistic.com/msp/keystore/16c4d9a8e8512426e1577e78e6dd31415bcc43a87fdb0f37349ba8894f53fd6e_sk
+    signedCert:
+      path: network/channel/crypto-config/peerOrganizations/logistic.iot-logistic.com/users/Admin@logistic.iot-logistic.com/msp/signcerts/Admin@logistic.iot-logistic.com-cert.pem
+  
+# List of orderers to send transaction and channel create/update requests to. For the time
+# being only one orderer is needed. If more than one is defined, which one get used by the
+# SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
+#
+orderers:
+  orderer.iot-logistic.com:
+    url: grpcs://localhost:7050
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer.iot-logistic.com
+    tlsCACerts:
+      path: network/channel/crypto-config/ordererOrganizations/iot-logistic.com/orderers/orderer.iot-logistic.com/tls/ca.crt
+
+#
+# List of peers to send various requests to, including endorsement, query
+# and event listener registration.
+#
+peers:
+  peer0.regulator.iot-logistic.com:
+    # this URL is used to send endorsement and query requests
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.regulator.iot-logistic.com
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/regulator.iot-logistic.com/peers/peer0.regulator.iot-logistic.com/tls/ca.crt
+
+  peer0.buyer.iot-logistic.com:
+    url: grpcs://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.buyer.iot-logistic.com
+      grpc.keepalive_time_ms: 600000
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/buyer.iot-logistic.com/peers/peer0.buyer.iot-logistic.com/tls/ca.crt
+
+  peer0.seller.iot-logistic.com:
+    url: grpcs://localhost:9051
+    grpcOptions:
+      ssl-target-name-override: peer0.seller.iot-logistic.com
+      grpc.keepalive_time_ms: 600000
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/seller.iot-logistic.com/peers/peer0.seller.iot-logistic.com/tls/ca.crt
+
+  peer0.logistic.iot-logistic.com:
+    url: grpcs://localhost:10051
+    grpcOptions:
+      ssl-target-name-override: peer0.logistic.iot-logistic.com
+      grpc.keepalive_time_ms: 600000
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/logistic.iot-logistic.com/peers/peer0.logistic.iot-logistic.com/tls/ca.crt
+
+#
+# Fabric-CA is a special kind of Certificate Authority provided by Hyperledger Fabric which allows
+# certificate management to be done via REST APIs. Application may choose to use a standard
+# Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
+#
+certificateAuthorities:
+  ca-regulator:
+    url: https://localhost:9054
+    # the properties specified under this object are passed to the 'http' client verbatim when
+    # making the request to the Fabric-CA server
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/regulator.iot-logistic.com/ca/ca.regulator.iot-logistic.com-cert.pem
+
+    # Fabric-CA supports dynamic user enrollment via REST APIs. A "root" user, a.k.a registrar, is
+    # needed to enroll and invoke new users.
+    registrar:
+      - enrollId: regulator_admin
+        enrollSecret: regulator
+    # [Optional] The optional name of the CA.
+    caName: ca-regulator
+
+  ca-buyer:
+    url: https://localhost:7054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/buyer.iot-logistic.com/ca/ca.buyer.iot-logistic.com-cert.pem
+    registrar:
+      - enrollId: buyer_admin
+        enrollSecret: buyer
+    # [Optional] The optional name of the CA.
+    caName: ca-buyer
+
+  ca-seller:
+    url: https://localhost:8054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/seller.iot-logistic.com/ca/ca.seller.iot-logistic.com-cert.pem
+    registrar:
+      - enrollId: seller_admin
+        enrollSecret: seller
+    # [Optional] The optional name of the CA.
+    caName: ca-seller
+
+  ca-logistic:
+    url: https://localhost:10054
+    httpOptions:
+      verify: false
+    tlsCACerts:
+      path: network/channel/crypto-config/peerOrganizations/logistic.iot-logistic.com/ca/ca.logistic.iot-logistic.com-cert.pem
+    registrar:
+      - enrollId: logistic_admin
+        enrollSecret: logistic
+    # [Optional] The optional name of the CA.
+    caName: ca-logistic

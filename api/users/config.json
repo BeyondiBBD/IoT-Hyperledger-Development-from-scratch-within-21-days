@@ -1,0 +1,16 @@
+{
+    "admins": {
+        "regulator_admin": {
+            "org": "Regulator"
+        },
+        "provider_admin": {
+            "org": "Provider"
+        },
+        "iot_admin": {
+            "org": "Iot"
+        },
+        "enduser_admin": {
+            "org": "Enduser"
+        }
+    }
+}

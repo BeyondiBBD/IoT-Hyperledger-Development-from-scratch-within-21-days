@@ -1,0 +1,27 @@
+{
+    "host":"localhost",
+    "port":"4000",
+    "jwt_expiretime": "36000",
+    "channelName":"logistics_channel",
+    "CC_SRC_PATH":"../network",
+    "eventWaitTime":"30000",
+    "admins": {
+       "Regulator": {
+          "username": "regulator_admin",
+          "secret": "regulator"
+       },
+       "Logistic": {
+         "username": "logistic_admin",
+         "secret": "logistic"
+      },
+      "Buyer": {
+         "username": "buyer_admin",
+         "secret": "buyer"
+      },
+      "Seller": {
+         "username": "seller_admin",
+         "secret": "seller"
+      }
+    }
+ }
+ 
